@@ -21,9 +21,10 @@ app.use(express.urlencoded({extended: false}))
 
 
 app.get('/',(req,res)=>{
+    const createdAt =  new Date() 
     const articles = [{
         title : 'Test article',
-        createdAt:  new Date(),
+        createdAt: createdAt.getDate() + "/" + (createdAt.getMonth() + 1) + "/" + createdAt.getFullYear(),
         description: 'Test description'
     }]
     res.render('articles/index',{articles : articles})
