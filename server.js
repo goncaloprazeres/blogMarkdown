@@ -4,11 +4,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require('express')
 const mongoose = require('mongoose')
+const Article = require('./models/article')
 const articleRouter = require('./routes/articles')
+const methodOverride = require('method-override')
 const app = express()
 
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true },{ 
-  useUnifiedTopology: true })
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true , useUnifiedTopology: true , useCreateIndex: true })
   const db = mongoose.connection
 db.on('error', error => console.error(error))
 db.once('open', () => console.log('Connected to Mongoose'))
@@ -17,16 +18,12 @@ db.once('open', () => console.log('Connected to Mongoose'))
 app.set('view engine','ejs')
 
 app.use(express.urlencoded({extended: false}))
+app.use(methodOverride('_method'))
 
 
 
-app.get('/',(req,res)=>{
-    const createdAt =  new Date() 
-    const articles = [{
-        title : 'Test article',
-        createdAt: createdAt.getDate() + "/" + (createdAt.getMonth() + 1) + "/" + createdAt.getFullYear(),
-        description: 'Test description'
-    }]
+app.get('/', async (req,res)=>{
+  const articles = await Article.find().sort({createdAt: 'desc'})
     res.render('articles/index',{articles : articles})
 })
 
